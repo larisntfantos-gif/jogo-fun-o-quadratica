@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jogo de Matemática - Função Quadrática</title>
+
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background: #f0f2f5;
+        margin: 0;
+        padding: 20px;
+    }
+
+    .container {
+        max-width: 800px;
+        margin: auto;
+        background: white;
+        padding: 25px;
+        border-radius: 15px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    h1 {
+        text-align: center;
+        color: #4b0082;
+    }
+
+    #info {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 15px;
+        font-weight: bold;
+    }
+
+    .barra {
+        width: 100%;
+        height: 20px;
+        background: #ddd;
+        border-radius: 10px;
+        overflow: hidden;
+        margin-bottom: 20px;
+    }
+
+    #progresso {
+        height: 100%;
+        width: 0%;
+        background: #4b0082;
+        transition: 0.3s;
+    }
+
+    .pergunta {
+        font-size: 20px;
+        margin-bottom: 20px;
+    }
+
+    .alternativa {
+        display: block;
+        width: 100%;
+        padding: 12px;
+        margin: 10px 0;
+        border: 2px solid #ccc;
+        border-radius: 10px;
+        background: white;
+        cursor: pointer;
+        font-size: 16px;
+    }
+
+    .alternativa:hover {
+        background: #f5f5f5;
+    }
+
+    .correta {
+        background: #4CAF50 !important;
+        color: white;
+        border-color: #4CAF50;
+    }
+
+    .errada {
+        background: #f44336 !important;
+        color: white;
+        border-color: #f44336;
+    }
+
+    #resultado {
+        text-align: center;
+        display: none;
+    }
+
+    #reiniciar {
+        padding: 12px 20px;
+        background: #4b0082;
+        color: white;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        font-size: 16px;
+    }
+
+    .grafico {
+        text-align: center;
+        font-size: 60px;
+        margin: 20px 0;
+    }
+
+</style>
+</head>
+<body>
+
+<div class="container">
+
+<h1>🎓 Jogo de Função Quadrática</h1>
+
+<div id="info">
+    <span id="nivel">Nível: Fácil</span>
+    <span>Pontos: <span id="pontos">0</span></span>
+</div>
+
+<div class="barra">
+    <div id="progresso"></div>
+</div>
+
+<div id="quiz">
+    <div class="pergunta" id="pergunta"></div>
+    <div id="grafico"></div>
+    <div id="alternativas"></div>
+</div>
+
+<div id="resultado">
+    <h2>Fim do jogo!</h2>
+    <p id="pontuacaoFinal"></p>
+    <button id="reiniciar" onclick="iniciar()">Jogar Novamente</button>
+</div>
+
+</div>
+
+<script>
+
+const perguntas = [
+
+/* FÁCIL */
+
+{
+nivel:"Fácil",
+pergunta:"Qual é o grau da função quadrática?",
+opcoes:["2","1"],
+correta:0
+},
+
+{
+nivel:"Fácil",
+pergunta:"Na função y=x², a parábola é voltada para:",
+opcoes:["Cima","Baixo"],
+correta:0
+},
+
+{
+nivel:"Fácil",
+pergunta:"Quantas raízes uma função quadrática pode ter no máximo?",
+opcoes:["2","4"],
+correta:0
+},
+
+{
+nivel:"Fácil",
+pergunta:"Qual é a forma geral da função quadrática?",
+opcoes:["ax²+bx+c","ax+b"],
+correta:0
+},
+
+{
+nivel:"Fácil",
+pergunta:"Se a > 0, a parábola abre para:",
+opcoes:["Cima","Baixo"],
+correta:0
+},
+
+/* MÉDIO */
+
+{
+nivel:"Médio",
+pergunta:"As raízes de x²−5x+6=0 são:",
+opcoes:["2 e 3","1 e 6","-2 e -3","0 e 6"],
+correta:0
+},
+
+{
+nivel:"Médio",
+pergunta:"O vértice da parábola representa:",
+opcoes:[
+"Ponto máximo ou mínimo",
+"Raiz da função",
+"Coeficiente angular",
+"Delta"
+],
+correta:0
+},
+
+{
+nivel:"Médio",
+pergunta:"Qual é o valor de Δ em x²−4x+3?",
+opcoes:["4","8","16","1"],
+correta:0
+},
+
+{
+nivel:"Médio",
+pergunta:"Se Δ < 0, a função possui:",
+opcoes:[
+"Nenhuma raiz real",
+"Duas raízes reais",
+"Uma raiz",
+"Três raízes"
+],
+correta:0
+},
+
+{
+nivel:"Médio",
+pergunta:"Observe o gráfico: ∪ A parábola representa:",
+grafico:"∪",
+opcoes:[
+"Valor mínimo",
+"Valor máximo",
+"Duas raízes iguais",
+"Nenhuma raiz"
+],
+correta:0
+},
+
+/* DIFÍCIL */
+
+{
+nivel:"Difícil",
+pergunta:"O vértice de y=x²−6x+5 é:",
+opcoes:[
+"(3,-4)",
+"(3,4)",
+"(2,-4)",
+"(2,4)"
+],
+correta:0
+},
+
+{
+nivel:"Difícil",
+pergunta:"As raízes de x²−7x+12=0 são:",
+opcoes:[
+"3 e 4",
+"2 e 6",
+"1 e 12",
+"-3 e -4"
+],
+correta:0
+},
+
+{
+nivel:"Difícil",
+pergunta:"Observe o gráfico: ∩ A parábola possui:",
+grafico:"∩",
+opcoes:[
+"Valor máximo",
+"Valor mínimo",
+"Nenhuma raiz",
+"Delta negativo"
+],
+correta:0
+},
+
+{
+nivel:"Difícil",
+pergunta:"O eixo de simetria de y=x²−8x+7 é:",
+opcoes:[
+"x=4",
+"x=8",
+"x=2",
+"x=7"
+],
+correta:0
+},
+
+{
+nivel:"Difícil",
+pergunta:"Para y=-x²+4x−3, o vértice é:",
+opcoes:[
+"(2,1)",
+"(2,-1)",
+"(1,2)",
+"(-2,1)"
+],
+correta:0
+}
+
+];
+
+let atual = 0;
+let pontos = 0;
+
+function iniciar(){
+    atual = 0;
+    pontos = 0;
+
+    document.getElementById("resultado").style.display="none";
+    document.getElementById("quiz").style.display="block";
+
+    mostrarPergunta();
+}
+
+function mostrarPergunta(){
+
+    let p = perguntas[atual];
+
+    document.getElementById("nivel").textContent =
+    "Nível: " + p.nivel;
+
+    document.getElementById("pontos").textContent =
+    pontos;
+
+    document.getElementById("pergunta").textContent =
+    `${atual+1}. ${p.pergunta}`;
+
+    document.getElementById("grafico").innerHTML =
+    p.grafico ? `<div class="grafico">${p.grafico}</div>` : "";
+
+    let alternativas = document.getElementById("alternativas");
+    alternativas.innerHTML="";
+
+    p.opcoes.forEach((opcao,index)=>{
+
+        let botao = document.createElement("button");
+
+        botao.className="alternativa";
+        botao.textContent=opcao;
+
+        botao.onclick=()=>responder(index);
+
+        alternativas.appendChild(botao);
+
+    });
+
+    document.getElementById("progresso").style.width =
+    ((atual)/perguntas.length)*100 + "%";
+}
+
+function responder(indice){
+
+    let botoes =
+    document.querySelectorAll(".alternativa");
+
+    let correta =
+    perguntas[atual].correta;
+
+    botoes.forEach((botao,i)=>{
+
+        botao.disabled=true;
+
+        if(i===correta){
+            botao.classList.add("correta");
+        }
+
+        if(i===indice && i!==correta){
+            botao.classList.add("errada");
+        }
+
+    });
+
+    if(indice===correta){
+        pontos++;
+        document.getElementById("pontos").textContent =
+        pontos;
+    }
+
+    setTimeout(()=>{
+
+        atual++;
+
+        if(atual<perguntas.length){
+            mostrarPergunta();
+        }
+
+        else{
+            finalizar();
+        }
+
+    },1000);
+
+}
+
+function finalizar(){
+
+    document.getElementById("quiz").style.display =
+    "none";
+
+    document.getElementById("resultado").style.display =
+    "block";
+
+    document.getElementById("pontuacaoFinal").textContent =
+    `Você acertou ${pontos} de ${perguntas.length} perguntas!`;
+
+    document.getElementById("progresso").style.width =
+    "100%";
+
+}
+
+iniciar();
+
+</script>
+
+</body>
+</html>
